@@ -25,33 +25,18 @@ uv run pytest            # run the test suite
 ```bash
 # Download the 100 MB enwik8 corpus into ./data (gitignored).
 uv run induce-text download enwik8
-
-# Evaluate baselines on the first 1 MB.
-uv run induce-text eval --data enwik8 --bytes 1000000
-
-# List available models / reference compressors.
-uv run induce-text list
-```
-
-Example output:
-
-```
-model              bpc    ratio   saving   comp.bytes
---------------------------------------------------------
-lzma            2.xxxx   0.xxxx   xx.xx%      xxx,xxx
-...
-uniform         8.0000   1.0000    0.00%    1,000,000
 ```
 
 ## What's here
 
+The research core — the next-byte models, the metrics, and the `-log2 P`
+scoring loop — is written by hand by the author (see `CLAUDE.md`), so it is
+**not** in the repo yet. What's present is contract-clear infrastructure:
+
 | Module | Role |
 |---|---|
-| `models.py` | Online adaptive next-byte predictors: `uniform`, `order0`, `orderN` (n-gram with add-α smoothing), `interpN` (interpolated orders). The `ByteModel` interface: `prob(byte)` + `update(byte)`. |
-| `evaluate.py` | Scoring loop (`-log2 P` per byte) and off-the-shelf reference compressors (`gzip`, `bz2`, `lzma`). Everything reports into a common `bpc` `Result`. |
-| `metrics.py` | `Result` and bpc / ratio / space-saving definitions. |
 | `data.py` | On-demand download + slicing of enwik8 / enwik9. |
-| `cli.py` | `download` / `eval` / `list` commands. |
+| `cli.py` | `download` command (eval/list return once the core exists). |
 
 ## Why this framing
 
