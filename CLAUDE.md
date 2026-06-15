@@ -7,6 +7,23 @@ scored as compression on the enwik / Hutter Prize benchmark. This is the
 author's life task, not a product to ship fast. The ideas *are* the output; the
 code is the lab notebook in which the ideas are thought.
 
+## North star (this judges every decision below)
+
+The goal is **poiesis, not poema** — the making, not the made thing. To create
+something **beautiful, creative, innovative, powerful, efficient, and fun**, and
+to play the **infinite game** (Carse): play to keep playing and keep the
+creation alive and growing, not to win and stop.
+
+The **Hutter Prize is a proxy, an instrument** — it tells us where we are, it is
+never the objective. We explicitly do **not** game the metric: a specific, ugly,
+useless thing that wins the prize is a failure. Prefer scoring *poorly* on Hutter
+while building something elegant over the reverse.
+
+Practical bearing on design: weigh choices by elegance, generality, and
+generativity (does this open up moves or close them down?), treating "would win
+more bpc" as *evidence*, not verdict. When elegance and score conflict, surface
+the tension honestly — and lean elegant.
+
 ## Collaboration model (read this before writing code)
 
 The author retains deep, inside-out understanding of the project. The axis for
