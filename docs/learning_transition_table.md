@@ -77,3 +77,15 @@ $$P(a \mid a) = P(b \to \text{three-as, a symbol ago}) + P(a \to a)$$
 
 The issue is that this is not computationally tractable with a growing number of ways
 to reach a given symbol.
+
+## Fast inference
+30 Jun 2026
+
+The above method is suitable for slow inference, similar to making a conscious decision. But most of the times we want a quick decision.
+I feel we should be able to use some sort of dictionary look up for a fast inference.
+The goal is to come up with a find the simplest mapping that gives the correct answer. 
+e.g. In the above example, create an inference rule such as
+
+if input is `aaaba` then output is `a`. 
+
+Of course these need to be periodically recomputed using the slow inference rules.
