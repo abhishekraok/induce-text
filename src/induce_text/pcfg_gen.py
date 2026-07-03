@@ -2,63 +2,54 @@ from dataclasses import dataclass
 import random
 
 
-@dataclass
-class Hex:
-    value: int  #  0 <= val < 16
+from typing import NamedTuple, Iterator
+
+
+class BinaryHexChoice(NamedTuple):
+    """Stores two hexadecimal values."""
+
+    a: int
+    b: int
+
+    def choose(self, choice: bool) -> int:
+        return self.a if choice else self.b
 
 
 @dataclass
-class HexList:
-    data: list[Hex]
-
-
-class ISymbol:
-    def __init__(self, rng: random.Random) -> None:
-        self.rng = rng
-
-    def sample(self) -> Hex:
-        raise NotImplementedError
-
-
-class ConstantSymbol(ISymbol):
-    def __init__(self, rng: random.Random, constant: Hex) -> None:
-        super().__init__(rng)
-        self.constant = constant
-
-    def sample(self) -> Hex:
-        return self.constant
-
-
-class UniformChoiceSymbols(ISymbol):
-    def __init__(self, rng: random.Random, choices: list[Hex]) -> None:
-        super().__init__(rng)
-        self.choices = choices
-
-    def sample(self) -> Hex:
-        return self.rng.choice(self.choices)
-
-
 class Rule:
-    def __init__(self, symbols: list[ISymbol]) -> None:
-        self.symbols = symbols
+    symbols: list[int | BinaryHexChoice]
 
-    def sample(self) -> HexList:
-        return HexList(data=[s.sample() for s in self.symbols])
+    def sample(self, choices: Iterator[bool]):
+        results = []
+        for s in self.symbols:
+            if isinstance(s, BinaryHexChoice):
+                results.append(s.choose(next(choices)))
+            else:
+                results.append(s)
+        return results
+
+
+def bitstream(rng: random.Random):
+    while True:
+        yield rng.choice([True, False])
 
 
 class DataGenerator:
-    def __init__(self, seed=123) -> None:
+    def __init__(self, seed: int, rules: list[Rule]) -> None:
         self.seed = seed
-        rng = random.Random(seed)
-        a_or_b = UniformChoiceSymbols(rng, choices=[Hex(0xA), Hex(0xB)])
-        constant_c = ConstantSymbol(rng=rng, constant=Hex(0xC))
-        self.rule = Rule([a_or_b, constant_c])
+        self.rules = rules
+        self.rng = random.Random(seed)
 
-    def sample(self) -> HexList:
-        return self.rule.sample()
+    def sample(self) -> list[int]:
+        rule = self.rng.choice(self.rules)
+        return rule.sample(bitstream(self.rng))
 
 
 if __name__ == "__main__":
-    gen = DataGenerator(seed=44)
-    data = gen.sample()
-    print(data)
+    rule = Rule(
+        symbols=[0x0, 0x0, BinaryHexChoice(a=1, b=2), 0x0, BinaryHexChoice(a=3, b=4)]
+    )
+    for seed in range(4):
+        gen = DataGenerator(seed=seed, rules=[rule])
+        data = gen.sample()
+        print(data)
