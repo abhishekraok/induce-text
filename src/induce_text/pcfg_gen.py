@@ -39,7 +39,7 @@ class ChoiceMaker:
     def bitstream(self):
         while True:
             self.count += 1
-            yield self.rng.choice([True, False])
+            yield bool(self.rng.getrandbits(1))
 
 
 class DataGenerator:
