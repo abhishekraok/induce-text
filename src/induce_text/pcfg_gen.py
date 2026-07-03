@@ -1,33 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import random
-from typing import NamedTuple, Iterator
-
-
-class BinaryHexChoice(NamedTuple):
-    """Stores two hexadecimal values."""
-
-    a: int
-    b: int
-
-    def choose(self, choice: bool) -> int:
-        return self.a if choice else self.b
-
-
-@dataclass
-class Rule:
-    symbols: list[int | BinaryHexChoice | Rule]
-
-    def sample(self, choices: Iterator[bool]) -> list[int]:
-        results = []
-        for s in self.symbols:
-            if isinstance(s, BinaryHexChoice):
-                results.append(s.choose(next(choices)))
-            elif isinstance(s, Rule):
-                results.extend(s.sample(choices))
-            else:
-                results.append(s)
-        return results
+from typing import Iterator
 
 
 class ChoiceMaker:
@@ -36,29 +10,48 @@ class ChoiceMaker:
         self.rng = random.Random(seed)
         self.choices: list[bool] = []
 
-    def bitstream(self) -> Iterator[bool]:
-        while True:
-            self.choices.append(bool(self.rng.getrandbits(1)))
-            yield self.choices[-1]
+    def choice(self) -> bool:
+        self.choices.append(bool(self.rng.getrandbits(1)))
+        return self.choices[-1]
 
     @property
     def count(self):
         return len(self.choices)
 
+    def __str__(self) -> str:
+        return "".join(str(int(c)) for c in self.choices)
 
-class DataGenerator:
-    def __init__(self, rule: Rule) -> None:
-        self.rule = rule
 
-    def sample(self, choicemaker: ChoiceMaker) -> list[int]:
-        return self.rule.sample(choicemaker.bitstream())
+@dataclass
+class Rule:
+    symbols: list[str | list[str]]
+
+
+def sample(rule: Rule, env: dict, choicemaker: ChoiceMaker) -> list[int]:
+    result = []
+    for s in rule.symbols:
+        if isinstance(s, list):
+            choice = choicemaker.choice()
+            actual_s = s[0] if choice else s[1]
+        else:
+            actual_s = s
+        if actual_s not in env:
+            raise ValueError(f"Symbol {s} not found in environment {env}")
+        val = env[actual_s]
+        if isinstance(val, Rule):
+            result.extend(sample(val, env, choicemaker))
+        else:
+            result.append(val)
+    return result
 
 
 if __name__ == "__main__":
-    rule_5_then_a_or_b = Rule(symbols=[5, BinaryHexChoice(a=0xA, b=0xB)])
-    rule = Rule(symbols=[0x0, 0x0, rule_5_then_a_or_b, 0x0, BinaryHexChoice(a=3, b=4)])
-    gen = DataGenerator(rule=rule)
+    x = Rule(symbols=["a", "b", ["y", "d"], "e", "f", ["x", "a"]])
+    y = Rule(symbols=["a", "b", ["c", "d"]])
+
+    env = {"a": 10, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "x": x, "y": y}
     for seed in range(4):
         choicemaker = ChoiceMaker(seed=seed)
-        data = gen.sample(choicemaker)
-        print(data)
+        data = sample(rule=x, env=env, choicemaker=choicemaker)
+        hex_str = "".join([f"{x:x}" for x in data])
+        print(f"Raw data {hex_str}, choices {choicemaker}")
