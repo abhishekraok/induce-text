@@ -1,5 +1,10 @@
 # induce-text — project & collaboration agreement
 
+This file is the canonical shared context for **all** agents and tools (Claude,
+Codex, etc.) working in this repo. It carries everything an agent needs that
+the code itself does not say. Keep it current; when a decision here changes,
+change it here.
+
 ## What this is
 
 A long-term research program: **language modelling via program synthesis**,
@@ -23,6 +28,141 @@ Practical bearing on design: weigh choices by elegance, generality, and
 generativity (does this open up moves or close them down?), treating "would win
 more bpc" as *evidence*, not verdict. When elegance and score conflict, surface
 the tension honestly — and lean elegant.
+
+## The author
+
+- ML researcher/engineer since 2015 (Microsoft, Google DeepMind; trained PaLM
+  and Gemini). Expert in Python; learning Racket (long-term goal: master it).
+- EE undergrad (~20 years ago); information theory & coding was his favorite
+  subject. Strong *theory* (entropy, surprisal, source coding) but no hands-on
+  compression practice, and some of it is rusty. Anchor compression talk in
+  `-log2 p` / bits; explain coder machinery (arithmetic coding, PPM, mixing)
+  from intuition rather than assuming familiarity.
+- **Fun and learning outrank speed.** This is not a professional/ASAP setting.
+  Do not build what the author would enjoy building or learn from; teach the
+  concept and spar instead.
+
+## Core theses
+
+- **Verification thesis (why this project can work).** Generating candidate
+  programs is easy; *verification* is the bottleneck. A text corpus is a
+  near-infinite, free, ungameable verifier: every position's true next byte
+  labels itself, and the score is bits. Verification = scoring = loss = MDL,
+  all one number. The signal is *graded* (bits), not binary (pass/fail like
+  PBE exact-match) — denser signal, smoother search landscape.
+- **Expressivity vs. tractability (the tension the author has battled for
+  years).** General software engineering: maximally expressive, unlearnable.
+  wandering-light: learnable, poorly expressive. The attack here: grammars are
+  a genuine sweet spot (context-free = real hierarchy + polynomial inference);
+  don't pick a fixed point on the curve — *climb it under MDL*, adding
+  expressivity only where the data pays for it in bits; and compression's dense
+  signal may make expressivity more learnable than sparse PBE reward ever could.
+- **World-model prediction (mid-level idea to explore).** JEPA-style: first
+  *recognize* the data into a higher-level abstraction, then predict in that
+  abstract space. Reconciled with losslessness via the residual two-part code:
+  `bits(model) + bits(data | model)` — the abstraction doesn't replace byte
+  prediction, it makes bytes *cheap*. Bonus: lossless compression grounds the
+  abstraction, so JEPA's representational collapse can't happen.
+
+## Prior work (the author's, converging here)
+
+- **StreamPredictor** (`~/repos/StreamPredictor`) — hierarchical
+  patterns-of-patterns text predictor. Its plateau left scars now treated as
+  design constraints: never key knowledge by exact match (reachability; query
+  by partial/prefix match), watch effective context length (silent bigram
+  collapse), measure *calibration* not just accuracy, votes must sum not
+  overwrite, and charge description length for the model (two-part code) so
+  more data always helps.
+- **wandering-light** (`~/repos/wandering-light`) — PBE via self-play
+  (induction + proposal tasks). Learnable but inexpressive; its binary
+  exact-match reward is the sparsity this project's bit-signal replaces.
+- **code-map** (`~/repos/code-map`) — Racket image-based function library
+  (function-per-file, REPL, persistence). Candidate substrate for the eventual
+  library of synthesized predictor functions.
+
+## Settled design decisions
+
+1. **A language model is a compressor.** Measure any next-byte model as
+   `sum of -log2 P(actual byte)` = the bits an ideal arithmetic coder would
+   emit; report **bits per byte (bpc)**. No coder needed to *measure*; the
+   interface must stay coder-ready (full distribution) so one can be added.
+2. **Symbol = byte** (256-way). Universal alphabet, no tokenizer to ship. Toy
+   hex data is just 16 of the 256 byte values; structure-aware *features* can
+   live inside the model.
+3. **The model returns a full distribution** over 256 next-byte values — not
+   just `p(true byte)` (that shape cannot decode). Later enrich with a "why"
+   trace for credit assignment.
+4. **State is explicit and threaded (JAX-style pure step, in plain Python).**
+   `predict(state) -> distribution`; `absorb(state, byte) -> state'`; the
+   online loop is a scan accumulating `-log2 p`. State is an incremental
+   sufficient statistic, not raw history. Invariant: the prediction at t
+   depends only on bytes < t, and encoder/decoder recompute identical beliefs
+   by replaying identical updates. Explicit state gives snapshot/branch for
+   search and is the synthesis-friendly target.
+5. **Composition deferred.** A mixer of models wears the same
+   predict/absorb interface (its state = children's states + weights); a
+   mixer that learns its weights online *is* credit assignment. The combine
+   rule (average vs product vs gating) is deliberately undecided until a
+   working atom exists.
+6. **Language: Python now, Racket later.** Keep every step single-unknown:
+   design in the fluent language, learn Racket by porting *settled* designs.
+   Racket remains the long-term home for the object language / shipped
+   artifact (homoiconicity dissolves the data<->code tension felt in Python).
+   Represent grammars/programs as **inert data walked by one interpreter**
+   (the metacircular-evaluator pattern), never as live object graphs.
+7. **Synthetic data with a known-MDL oracle before real data.** The
+   generator logs the exact bits spent on each choice, so ideal compression is
+   *known* and verification becomes absolute, not merely relative to gzip.
+   Curriculum, each rung targeting a known failure mode: periodic -> skewed
+   i.i.d. (calibration) -> order-k Markov (context) -> long-range copy
+   (reachability; NOT context-free — will need an extension) -> nested
+   grammar (abstraction). Anti-circularity: the predictor must not share the
+   generator's primitives, and must be a generalizable basis, or hitting ideal
+   MDL is trivial and tests nothing. After the synthetic rungs: small prefixes
+   of enwik8 (100KB–1MB). Skip Calgary/Canterbury.
+
+## Current state (early July 2026)
+
+- **Infra** (agent-drafted, reviewed): `data.py` (enwik8/9 download + slice),
+  `cli.py` (`download`), `tests/test_data.py`. An earlier baseline-model
+  scaffold was deliberately deleted (`56334c0`) so the author writes the core
+  from a blank file; it survives only in git history, unpeeked.
+- **`src/induce_text/pcfg_gen.py`** (author-written, in progress): a binary
+  dyadic PCFG **generator = decompressor**. Grammar as data: `Rule` = list of
+  symbols, each a name or a 2-list `[a, b]` meaning a 50:50 one-bit choice;
+  `env: dict[str, int | Rule]` maps names to terminals or rules — names +
+  environment lookup give recursion (self-reference forces exactly this).
+  One interpreter `sample(rule, env, choicesource)`; `ChoiceSource` protocol
+  with `RecordingChoice` (rng + transcript) and `ReplayChoice` (replays a
+  given bitstring). Key facts: the choice transcript *is* the compressed form
+  of the output; `(grammar, transcript)` is a literal two-part code; valid
+  complete transcripts form a prefix-free code (Kraft equality <-> a.s.
+  termination); bits live at *choice points*, so deterministic structure is
+  free.
+- **`docs/learning_transition_table.md`** (author's idea sketch): recognize
+  raw symbols into higher-level features, learn a transition table over them,
+  predict by summing over derivations. Sparring outcomes: this re-derives
+  PCFG prediction; the derivation-sum is the inside algorithm and the
+  intractability is solved by dynamic programming; recognition and prediction
+  should be **one joint inference over a distribution of partial parses**,
+  not two sequential steps (hard segmentation can't be right — ambiguity is
+  future-dependent); softmax-over-counts is a placeholder (wrong calibration
+  paradigm; use normalized smoothed counts). The "fast inference" addendum is
+  amortized inference / chunking (System 1/2) — sound, deferred, must sit
+  under the same MDL accounting.
+- **Open next steps** (author's): (1) round-trip test — record a transcript,
+  replay it, assert identical output *and* all bits consumed (leftover bits =
+  non-unique codes); (2) **calibration win condition** — hand-derive expected
+  output length and bits for the example grammar via one-step-expansion
+  equations (agent's independent answers: E[length]=13, E[bits]=5), then check
+  empirical means over ~10k samples; three-way agreement calibrates the
+  instrument. Then: predictor/interface implementation, feature learning
+  (deferred: transition table doubles as a feature proposer — high-weight
+  transitions mint new features, i.e. grammar induction a la Sequitur), and a
+  possible Racket port of the settled generator as a learning exercise.
+- **Reading queue** (vocabulary, deliberately *after* building): Sequitur
+  (Nevill-Manning & Witten) first; Stolcke 1995 (prefix probabilities);
+  inside-outside; DreamCoder (Ellis et al., library learning under MDL).
 
 ## Collaboration model (read this before writing code)
 
@@ -67,3 +207,9 @@ Three tiers:
 
 - Python via `uv` (3.12). `uv sync --extra dev`; `uv run pytest`.
 - Commit changes with clear, descriptive messages (standing instruction).
+
+## Planned
+
+- The author's Obsidian Zettelkasten notes will eventually migrate into this
+  repo (likely under `docs/`) so all the project's ideas live organized in one
+  place alongside the code.
