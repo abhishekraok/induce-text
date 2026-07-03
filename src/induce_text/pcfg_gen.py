@@ -34,12 +34,16 @@ class ChoiceMaker:
     def __init__(self, seed: int):
         self.seed = seed
         self.rng = random.Random(seed)
-        self.count = 0
+        self.choices: list[bool] = []
 
-    def bitstream(self):
+    def bitstream(self) -> Iterator[bool]:
         while True:
-            self.count += 1
-            yield bool(self.rng.getrandbits(1))
+            self.choices.append(bool(self.rng.getrandbits(1)))
+            yield self.choices[-1]
+
+    @property
+    def count(self):
+        return len(self.choices)
 
 
 class DataGenerator:
