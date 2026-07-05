@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import random
-from typing import Iterator, Protocol
+from typing import Protocol
 
 
 class ChoiceSource(Protocol):
