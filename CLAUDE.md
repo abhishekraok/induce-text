@@ -162,7 +162,8 @@ the tension honestly — and lean elegant.
   possible Racket port of the settled generator as a learning exercise.
 - **Reading queue** (vocabulary, deliberately *after* building): Sequitur
   (Nevill-Manning & Witten) first; Stolcke 1995 (prefix probabilities);
-  inside-outside; DreamCoder (Ellis et al., library learning under MDL).
+  inside-outside; DreamCoder (Ellis et al., library learning under MDL). Full
+  curated list (books + papers, by thread) in `docs/reading_list.md`.
 
 ## Collaboration model (read this before writing code)
 
