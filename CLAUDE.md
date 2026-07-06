@@ -150,16 +150,24 @@ the tension honestly — and lean elegant.
   paradigm; use normalized smoothed counts). The "fast inference" addendum is
   amortized inference / chunking (System 1/2) — sound, deferred, must sit
   under the same MDL accounting.
-- **Open next steps** (author's): (1) round-trip test — record a transcript,
-  replay it, assert identical output *and* all bits consumed (leftover bits =
-  non-unique codes); (2) **calibration win condition** — hand-derive expected
-  output length and bits for the example grammar via one-step-expansion
-  equations (agent's independent answers: E[length]=13, E[bits]=5), then check
-  empirical means over ~10k samples; three-way agreement calibrates the
-  instrument. Then: predictor/interface implementation, feature learning
-  (deferred: transition table doubles as a feature proposer — high-weight
-  transitions mint new features, i.e. grammar induction a la Sequitur), and a
-  possible Racket port of the settled generator as a learning exercise.
+- **Done (July 2026):** round-trip test (`tests/test_pcfg_gen.py`) — record a
+  transcript, replay it, assert identical output, *all* bits consumed
+  (leftover bits = non-unique codes), and truncated transcript raises.
+  Together these pin the prefix-code property: a valid transcript is consumed
+  exactly. (Kraft connection explained — Kraft sum = P(termination), equality
+  <-> a.s. termination — but parked by the author for now.)
+- **Open next steps** (author's): (1) **calibration win condition** — hand-
+  derive expected output length and bits for the example grammar via
+  one-step-expansion equations, then check empirical means over ~10k seeds;
+  three-way agreement (derivation, independent answer, empirics) calibrates
+  the instrument. NOTE: the agent's recorded answers E[length]=13, E[bits]=5
+  are for the *older* two-rule grammar in `pcfg_gen.py`'s `__main__` (with
+  `y`); the test grammar inlines `y`, so derive for whichever grammar is
+  used. Then: (2) predictor/interface implementation (author-written core);
+  (3) feature learning (deferred: transition table doubles as a feature
+  proposer — high-weight transitions mint new features, i.e. grammar
+  induction a la Sequitur); (4) a possible Racket port of the settled
+  generator as a learning exercise.
 - **Reading queue** (vocabulary, deliberately *after* building): Sequitur
   (Nevill-Manning & Witten) first; Stolcke 1995 (prefix probabilities);
   inside-outside; DreamCoder (Ellis et al., library learning under MDL). Full
