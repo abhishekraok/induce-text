@@ -20,13 +20,18 @@ The tension has two distinct formal homes:
   hypothesis-class richness; VC dimension; the rigorous bias-variance tradeoff.
   Where "richer class = harder to learn" is made precise. Dated and dry, but
   foundational.
-- **De Raedt, _Logic and Learning_ (and _Logical and Relational Learning_)** /
-  **Muggleton & De Raedt** ILP surveys. Closer to this project because it's
-  about learning *programs/logic*, not fitting functions. Key concept:
-  **language bias** — the field's name for exactly our dial (you *choose* the
-  hypothesis language's expressivity, and that choice is the whole game). The
-  body of work most directly about "climb the expressivity curve under MDL," and
-  the one the author is least likely to have absorbed from mainstream ML.
+- **Luc De Raedt, _Logical and Relational Learning_ (Springer, 2008).** The
+  ILP textbook. Closer to this project because it's about learning
+  *programs/logic*, not fitting functions. Key concept: **language bias** —
+  the field's name for exactly our dial (you *choose* the hypothesis
+  language's expressivity, and that choice is the whole game); also
+  refinement operators (search moves through hypothesis space) and
+  generality ordering. The body of work most directly about "climb the
+  expressivity curve under MDL," and the one the author is least likely to
+  have absorbed from mainstream ML. Free shorter entry point: **Muggleton &
+  De Raedt, "Inductive Logic Programming: Theory and Methods" (J. Logic
+  Programming, 1994)** — the classic survey, where declarative/language bias
+  is laid out.
 
 ## MDL / compression / algorithmic information (the theoretical bedrock)
 
