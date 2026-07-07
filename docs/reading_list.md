@@ -63,6 +63,22 @@ No single canonical *book*; the field lives in papers (see below). Closest:
   textbook treatment of PCFGs, CYK, and inside–outside — the machinery the
   transition-table sketch re-derived. Reference it, don't read it through.
 
+## Racket-mastery side track (off the research critical path)
+
+- **Abelson & Sussman, _SICP_, chapter 4.** _[author: started 6 months ago at
+  ch. 4, stopped at the logic-programming subsection]_ Safe anytime (MacKay
+  category: refreshes/deepens, doesn't anchor). The map to this project:
+  4.1 metacircular evaluator = `sample(rule, env, choicesource)` (already
+  lived); **4.3 `amb`** = `ChoiceSource` reinvented — record/replay a path
+  through the choice tree, and its sentence-parsing example is
+  recognition-as-search-over-derivations in miniature (re-skim with new
+  eyes); **4.4 logic programming** = unification, i.e. principled
+  partial-structure matching — the reachability scar's formal answer, and
+  the substrate ILP (De Raedt, above) learns programs *for*: SICP builds the
+  machine, ILP learns for it — read 4.4 before De Raedt. Chapter 5 (register
+  machines, compilation): park until the fast-inference/amortization idea
+  matures.
+
 ## Philosophical frame
 
 - **Carse, _Finite and Infinite Games_.** _[author: read]_ The source of
