@@ -121,7 +121,7 @@ the tension honestly — and lean elegant.
    MDL is trivial and tests nothing. After the synthetic rungs: small prefixes
    of enwik8 (100KB–1MB). Skip Calgary/Canterbury.
 
-## Current state (early July 2026)
+## Current state (August 2026)
 
 - **Infra** (agent-drafted, reviewed): `data.py` (enwik8/9 download + slice),
   `cli.py` (`download`), `tests/test_data.py`. An earlier baseline-model
@@ -156,18 +156,47 @@ the tension honestly — and lean elegant.
   Together these pin the prefix-code property: a valid transcript is consumed
   exactly. (Kraft connection explained — Kraft sum = P(termination), equality
   <-> a.s. termination — but parked by the author for now.)
+- **Done (Aug 2026 credits sprint, agent-written — see the collaboration
+  amendment below):** the evaluation stack, end to end. `model.py` — the
+  `Model` protocol (`init`/`predict`/`absorb`, full 256-way distribution,
+  explicit threaded state) plus the scoring scan `score_bits` (settled
+  decisions 1–4 in code; note: `absorb` may mutate its argument — the
+  signature stays pure-shaped, purity is to ratify at rewrite).
+  `baselines.py` — `Uniform` (exactly 8 bpc; harness self-test),
+  `AdaptiveIID` (KT add-half counts), `ContextK(k)` (per-context counts,
+  additive smoothing; deliberately NO cross-order mixing — that is the
+  deferred composition decision). `sources.py` — the full curriculum with
+  exact oracle bits: `periodic`, `skewed_iid` (dyadic, H = 1.875),
+  `markov` (4-state cycle chain, H ~ 0.61), `long_range_copy` (LZ-ish,
+  long cheap copies), `pcfg` (the author's generator as rung 5; oracle =
+  transcript length since all choices are dyadic). `benchmark.py` + CLI
+  `eval` (matrix -> table / JSON / learning-curve plots, gzip/bz2/xz
+  reference columns; outputs in gitignored `results/`) and `calibrate`
+  (empirical episode means). 30 tests pass.
+- **First results** (n=30k synthetic / 100KB enwik8, seed 0): `iid` sits on
+  the skewed_iid oracle (1.92 vs 1.88, beating gzip); `ctx1` approaches the
+  markov oracle (0.75 vs 0.63); **every context model fails
+  long_range_copy** (3.6+ vs oracle 2.19) while gzip/xz (~2.0) beat even
+  the oracle — the reachability rung empirically demands the copy
+  extension; pcfg: best baseline `ctx2` = 0.58 vs oracle 0.36 — that gap
+  is what grammar-awareness must earn; enwik8-100KB: `ctx1` 4.05, `ctx3`
+  4.97 — *worse than* `iid` 4.89 (the expressivity/tractability tension in
+  the wild), gzip 2.90.
 - **Open next steps** (author's): (1) **calibration win condition** — hand-
-  derive expected output length and bits for the example grammar via
-  one-step-expansion equations, then check empirical means over ~10k seeds;
-  three-way agreement (derivation, independent answer, empirics) calibrates
-  the instrument. NOTE: the agent's recorded answers E[length]=13, E[bits]=5
-  are for the *older* two-rule grammar in `pcfg_gen.py`'s `__main__` (with
-  `y`); the test grammar inlines `y`, so derive for whichever grammar is
-  used. Then: (2) predictor/interface implementation (author-written core);
-  (3) feature learning (deferred: transition table doubles as a feature
-  proposer — high-weight transitions mint new features, i.e. grammar
-  induction a la Sequitur); (4) a possible Racket port of the settled
-  generator as a learning exercise.
+  derive expected output length and bits via one-step-expansion equations.
+  The empirical column now exists (`induce-text calibrate`, 10k episodes):
+  test grammar 11.13 / 4.05; `__main__` grammar 13.09 / 5.04 — the latter
+  matches the agent's previously recorded E[length]=13, E[bits]=5, which
+  validates the harness. The agent holds a sealed closed-form answer for
+  the test grammar; derivation first, then compare, for the three-way
+  agreement. (2) **absorb the sprint code** — read `model.py` first (the
+  scan every reported number flows through), then `baselines.py` /
+  `sources.py`; rewrite whatever surprises. (3) predictor design
+  (author-written core): close the oracle gaps the baselines leave open,
+  starting with the pcfg rung. (4) feature learning (deferred: transition
+  table doubles as a feature proposer — high-weight transitions mint new
+  features, i.e. grammar induction a la Sequitur); (5) a possible Racket
+  port of the settled generator as a learning exercise.
 - **Reading queue** (vocabulary, deliberately *after* building): Sequitur
   (Nevill-Manning & Witten) first; Stolcke 1995 (prefix probabilities);
   inside-outside; DreamCoder (Ellis et al., library learning under MDL). Full
@@ -196,6 +225,15 @@ Three tiers:
   verifiable contract: data loaders, CLI, plotting, test scaffolds, baseline
   compressors. Read until nothing surprises you, then own it.
 - **Agent writes freely** — throwaway probes, one-shot scripts, boilerplate.
+
+**Amendment (Aug 2026, author-authorized):** the tiers are not sacrosanct.
+During the August credits sprint the agent wrote the evaluation stack
+end-to-end — including the scoring scan the tiers reserve for the author.
+What survives is the *purpose* behind the rule, not the rule: never land in
+the local optimum where something load-bearing exists that the author does
+not understand. The author will read the crucial parts to fluency (the
+scoring scan first), rewriting wherever surprised; until then the harness
+numbers carry provisional trust.
 
 ## How the agent should behave here
 
