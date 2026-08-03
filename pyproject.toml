@@ -9,11 +9,14 @@ description = "Program synthesis for language modelling, scored as compression (
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
-dependencies = []
+dependencies = [
+    "numpy>=1.26",
+]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "matplotlib>=3.8",
 ]
 
 [project.scripts]
