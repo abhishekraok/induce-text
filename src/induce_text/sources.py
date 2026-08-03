@@ -137,6 +137,14 @@ def pcfg_test_grammar() -> tuple[Rule, dict[str, int | Rule]]:
     return rule, env
 
 
+def pcfg_main_grammar() -> tuple[Rule, dict[str, int | Rule]]:
+    """The older two-rule grammar from ``pcfg_gen.py``'s ``__main__``."""
+    x = Rule(symbols=["a", "b", ["y", "d"], "e", "f", ["x", "a"]])
+    y = Rule(symbols=["a", "b", ["c", "d"]])
+    env = {"a": 10, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "x": x, "y": y}
+    return x, env
+
+
 def pcfg(n: int, seed: int = 0) -> tuple[bytes, float]:
     """Concatenated episodes from the test grammar; oracle = total choice bits."""
     rule, env = pcfg_test_grammar()
