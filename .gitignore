@@ -10,3 +10,6 @@ dist/
 # Data (downloaded benchmark corpora — large, not vendored)
 data/
 *.zip
+
+# Benchmark outputs (regenerable via `induce-text eval`)
+results/
