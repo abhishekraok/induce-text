@@ -182,6 +182,16 @@ the tension honestly — and lean elegant.
   is what grammar-awareness must earn; enwik8-100KB: `ctx1` 4.05, `ctx3`
   4.97 — *worse than* `iid` 4.89 (the expressivity/tractability tension in
   the wild), gzip 2.90.
+- **Viz tools (Aug 2026, agent-written):** `viz.py` + CLI `viz` —
+  surprisal-colored text (`viz heat`: per-byte cost as background heat,
+  model's top guesses in tooltips), two-model delta view (`--vs`), PCFG
+  derivation tree with each transcript bit pinned to its choice point
+  (`viz tree`; deterministic structure visibly free), reliability diagram
+  over every byte slot (`viz calibration`; the additive-smoothing floor is
+  visible as a cliff at p ~ 0.5/258), and context-table growth
+  (`viz growth`; the unpaid model half of the two-part code). Trust
+  discipline: every view re-derives what it shows and self-checks against
+  `score_bits` / the author's `sample`, raising on disagreement.
 - **Open next steps** (author's): (1) **calibration win condition** — hand-
   derive expected output length and bits via one-step-expansion equations.
   The empirical column now exists (`induce-text calibrate`, 10k episodes):
