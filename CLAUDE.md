@@ -123,6 +123,14 @@ the tension honestly — and lean elegant.
 
 ## Current state (August 2026)
 
+- **TRACK PARKED (mid-Aug 2026):** the author paused the PCFG direction
+  (generator, grammar-aware predictor design, calibration derivation) to
+  explore **other approaches** to the same problem. Handoff notes:
+  `docs/handoff_pcfg_track.md`. The evaluation stack below is
+  approach-agnostic and stays live — any new predictor wearing
+  `predict`/`absorb` plugs into the same harness and oracles. The details
+  below describe the parked track and the shared infra.
+
 - **Infra** (agent-drafted, reviewed): `data.py` (enwik8/9 download + slice),
   `cli.py` (`download`), `tests/test_data.py`. An earlier baseline-model
   scaffold was deliberately deleted (`56334c0`) so the author writes the core
