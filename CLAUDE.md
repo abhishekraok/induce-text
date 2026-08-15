@@ -116,88 +116,74 @@ the tension honestly — and lean elegant.
 
 ## The daily loop (read this before writing code)
 
-One cycle: the author spends ~1 hour on results and direction; the agent then
-works up to 23 hours and comes back with artifacts. **The author does not read
-the diff.** Artifacts, not code, are the deliverable — so they must be
-trustworthy *without* a code review. Communication is the bottleneck; produce
-lots of visual artifacts.
+One cycle: the author spends ~1 hour on results and direction; the agent works
+up to 23 hours and returns artifacts. **The author does not read the diff** — so
+artifacts must be trustworthy without a code review. Communication is the
+bottleneck; produce lots of visual artifacts.
 
-A run:
-
-1. **Pre-register** — each experiment, what you expect, and what each outcome
-   would mean, before running anything. Drop any experiment whose outcomes
-   would not change what we do next. Few decisive experiments, not many shallow
-   ones: 23 hours defaults to volume, and volume is what the author's hour
-   cannot absorb.
-2. **Work.** Tests, probes and verification everywhere they are cheap.
+1. **Pre-register** each experiment, what you expect, and what each outcome
+   would mean, before running. Drop any whose outcomes change nothing. Few
+   decisive experiments: 23 hours defaults to volume, and volume is what the
+   author's hour cannot absorb.
+2. **Work.** Tests and probes wherever they are cheap.
 3. **Self-verify.** No number is reportable without its oracle gap and an
-   independent re-derivation that raises on disagreement. This is what replaces
-   the author's code review — an agent cannot fake an oracle gap.
+   independent re-derivation that raises on disagreement. An agent cannot fake
+   an oracle gap; that is what replaces the code review.
 4. **Report** to `results/reports/<date>-<slug>.md`: surprises first, then
    numbers, artifacts, **what you did not do and where you might be fooling the
    reader**, then proposed next.
-5. **Log.** Append one entry to `JOURNAL.md` linking the report, and commit.
-6. **Propose** durable learnings for this file — see § Changing this file.
-   "Nothing durable" is a fine answer, and the expected one most days.
+5. **Log** one entry in `JOURNAL.md` linking the report, and commit.
+6. **Propose** durable learnings for this file. "Nothing durable" is the
+   expected answer most days.
 
-Templates and the full protocol: `docs/run_protocol.md`.
+Templates: `docs/run_protocol.md`.
 
 ## Explaining an algorithm
 
-When a new algorithm enters the project — to adopt, to port, or just to decide
-about — build an interactive artifact, not a summary: steppable execution, state
-visible at once, inputs chosen so at least one is a case the algorithm *fails*,
-and proxies labelled as proxies. The author learns mechanisms by driving them,
-and it beats reading the paper.
-
-How, and the bar to match: `docs/explainers.md`.
+When a new algorithm enters — to adopt, to port, or to decide about — build an
+interactive artifact rather than a summary: steppable, internal state visible,
+and at least one input the algorithm *fails* on. The author learns mechanisms by
+driving them. Craft and the bar to match: `docs/explainers.md`.
 
 ## Where state lives (this file holds only invariants)
 
-CLAUDE.md is for what does not change: goals, theses, settled decisions, how we
-work. Anything that moves lives elsewhere, so it can be rewritten without
-touching the agreement — and so nothing here goes quietly stale.
+Anything that moves lives outside this file, so it can be rewritten without
+touching the agreement.
 
-- **`JOURNAL.md`** — the running summary: one terse entry per run linking its
-  report, plus any open doubts about the harness itself. Descriptions and
-  pointers, *not* results — numbers live in the reports, and `induce-text eval`
-  regenerates the current bar. Read it before starting; append before finishing.
-  Keep entries to ~3 lines and fold old ones into one as it grows.
-- **`results/reports/`** — the full report for each run, with the figures worth
-  keeping. Tracked in git.
-- **`results/`** (everything else) — scratch: regenerable eval output, probes,
-  throwaway plots. Gitignored, and never linked from `JOURNAL.md`.
-- **`docs/`** — durable design notes and handoffs, e.g.
-  `docs/handoff_pcfg_track.md` (the parked PCFG track).
+- **`JOURNAL.md`** — one terse entry per run linking its report, plus open
+  doubts about the harness. Descriptions and pointers, *not* results. Read
+  before starting, append before finishing; entries ~3 lines, fold old ones
+  into one.
+- **`results/reports/`** — each run's report and the figures worth keeping.
+  Tracked.
+- **`results/`** otherwise — scratch, gitignored, never linked from the journal.
+- **`docs/`** — design notes, handoffs, and the on-demand protocol files above.
 
-The journal is auto-loaded for Claude Code by the import below; other agents
-should read it explicitly.
+Claude Code auto-loads the journal via the import below; other agents read it
+explicitly.
 
 @JOURNAL.md
 
 ## Changing this file
 
-CLAUDE.md dictates agent behaviour, so it gets the author's scrutiny rather than
-an agent's judgement. It is the one file an agent may not change on its own
-initiative.
+This file dictates agent behaviour, so it is the one file an agent may not
+change on its own initiative.
 
-- **Never edit CLAUDE.md without the author's consent.**
-- **Edit, then ask, then commit — in that order.** Propose by making the edit, so
-  the author reviews a real diff instead of a description of one; then stop, and
-  do not commit until he says so. This inverts the standing rule for ordinary
+- **Never edit it without the author's consent.**
+- **Edit, then ask, then commit — in that order.** Propose by making the edit so
+  he reviews a real diff, then stop. This inverts the standing rule for ordinary
   work, which commits freely.
-- **At the end of every task, look for durable learnings.** Ask: did anything
-  here change a settled decision, invalidate a thesis, or establish a convention
-  a future agent would otherwise rediscover the hard way? If yes, draft the edit
-  and raise it. If no, say so plainly — inventing an update to look thorough is
-  worse than silence.
-- **Durable means invariant.** Results, numbers, status and open puzzles go in
-  `JOURNAL.md`, which needs no permission. Only what would still be true in six
-  months belongs here. This file grows by exception; it should mostly shrink.
+- **At the end of every task, look for durable learnings** — anything that
+  changed a settled decision, invalidated a thesis, or established a convention
+  a future agent would otherwise rediscover. If none, say so; inventing one to
+  look thorough is worse than silence.
+- **Durable means invariant.** Results and status go in `JOURNAL.md`, which
+  needs no permission. Only what is still true in six months belongs here. This
+  file grows by exception; it should mostly shrink.
 
 ## Conventions
 
 - Python via `uv`. `uv sync --extra dev`; `uv run pytest`.
-- Commit changes with clear, descriptive messages (standing instruction) —
-  except this file, per § Changing this file.
+- Commit with clear, descriptive messages — except this file, per § Changing
+  this file.
 
