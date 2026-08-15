@@ -2,8 +2,8 @@
 
 This file is the canonical shared context for **all** agents and tools (Claude,
 Codex, etc.) working in this repo. It carries everything an agent needs that
-the code itself does not say. Keep it current; when a decision here changes,
-change it here.
+the code itself does not say. It is kept current by proposal, not by fiat — see
+§ Changing this file.
 
 ## What this is
 
@@ -52,11 +52,6 @@ the tension honestly — and lean elegant.
   it under MDL*, buying expressivity only where the data pays for it in bits.
   Compression's dense signal may make expressivity learnable where sparse PBE
   reward never could.
-- **World-model prediction** (mid-level idea to explore). JEPA-style: recognize
-  the data into a higher-level abstraction, then predict in that space. Kept
-  lossless by the two-part code, `bits(model) + bits(data | model)` — the
-  abstraction doesn't replace byte prediction, it makes bytes *cheap*. Because
-  compression grounds it, JEPA's representational collapse can't happen.
 
 ## Prior work (the author's, converging here)
 
@@ -146,6 +141,9 @@ A run:
      it even when it is dull. Silence here is this loop's failure mode.
    - **Proposed next** — ranked, with the reason each is next.
 5. **Log.** Append one entry to `JOURNAL.md` linking the report, and commit.
+6. **Propose.** Check for durable learnings that belong in this file and draft
+   them for the author's review — see § Changing this file. "Nothing durable"
+   is a fine answer, and the expected one most days.
 
 ## Where state lives (this file holds only invariants)
 
@@ -170,8 +168,29 @@ should read it explicitly.
 
 @JOURNAL.md
 
+## Changing this file
+
+CLAUDE.md dictates agent behaviour, so it gets the author's scrutiny rather than
+an agent's judgement. It is the one file an agent may not change on its own
+initiative.
+
+- **Never edit CLAUDE.md without the author's consent.**
+- **Edit, then ask, then commit — in that order.** Propose by making the edit, so
+  the author reviews a real diff instead of a description of one; then stop, and
+  do not commit until he says so. This inverts the standing rule for ordinary
+  work, which commits freely.
+- **At the end of every task, look for durable learnings.** Ask: did anything
+  here change a settled decision, invalidate a thesis, or establish a convention
+  a future agent would otherwise rediscover the hard way? If yes, draft the edit
+  and raise it. If no, say so plainly — inventing an update to look thorough is
+  worse than silence.
+- **Durable means invariant.** Results, numbers, status and open puzzles go in
+  `JOURNAL.md`, which needs no permission. Only what would still be true in six
+  months belongs here. This file grows by exception; it should mostly shrink.
+
 ## Conventions
 
 - Python via `uv`. `uv sync --extra dev`; `uv run pytest`.
-- Commit changes with clear, descriptive messages (standing instruction).
+- Commit changes with clear, descriptive messages (standing instruction) —
+  except this file, per § Changing this file.
 
