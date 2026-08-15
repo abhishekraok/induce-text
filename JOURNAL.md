@@ -20,7 +20,8 @@ matter more than results because the loop's trust rests on them.
 ## Entries
 
 - **2026-08-15** — regime change: artifact-driven daily loop; CLAUDE.md cut to
-  invariants; agents may not edit it without consent. PCFG track parked →
+  invariants; agents may not edit it without consent; interactive explainers
+  required when a new algorithm enters. PCFG track parked →
   `docs/handoff_pcfg_track.md`.
 - **2026-08-02** — evaluation stack and viz toolkit, agent-written: `model.py`,
   `baselines.py`, `sources.py`, `benchmark.py`, `viz.py`, CLI
