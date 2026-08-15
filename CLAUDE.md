@@ -32,10 +32,31 @@ the tension honestly — and lean elegant.
 ## The author
 
 - **Fun and learning outrank speed.** This is not a professional/ASAP setting.
-  Do not build what the author would enjoy building or learn from; teach the
-  concept and spar instead.
-- The author's Obsidian Zettelkasten notes, i.e.  mindset can be seen at ~/repos/obsidian
+  The author delegates implementation, but not understanding: what he wants back
+  from a run is insight, so reports must *teach* the mechanism, not just post the
+  number. Argue the other side of a design choice when there is one.
+- The author's Obsidian Zettelkasten notes — i.e. his mindset — are at
+  `~/repos/obsidian`.
 
+## Core theses
+
+- **Verification.** Generating candidate programs is easy; *verifying* them is
+  the bottleneck. A text corpus is a free, ungameable verifier: every position's
+  true next byte labels itself and the score is bits, so verification = loss =
+  MDL, all one number — and it is *graded*, not the binary pass/fail of PBE
+  exact-match. Corollary, in the author's words: **idea generation is cheap,
+  validation is the hard part.** Spend the effort there.
+- **Expressivity vs. tractability** (the tension the author has battled for
+  years). General software: maximally expressive, unlearnable. wandering-light:
+  learnable, inexpressive. The attack: don't pick a point on the curve — *climb
+  it under MDL*, buying expressivity only where the data pays for it in bits.
+  Compression's dense signal may make expressivity learnable where sparse PBE
+  reward never could.
+- **World-model prediction** (mid-level idea to explore). JEPA-style: recognize
+  the data into a higher-level abstraction, then predict in that space. Kept
+  lossless by the two-part code, `bits(model) + bits(data | model)` — the
+  abstraction doesn't replace byte prediction, it makes bytes *cheap*. Because
+  compression grounds it, JEPA's representational collapse can't happen.
 
 ## Prior work (the author's, converging here)
 
@@ -95,13 +116,59 @@ the tension honestly — and lean elegant.
    of enwik8 (100KB–1MB). Skip Calgary/Canterbury.
 
 
-## Collaboration model (read this before writing code)
-Whenever given a non trivial task, try to produce lots of visual artifacts.
-The author will not have time to review all the code changes and hence relies
-on experiment results and visualizations. Communication is the key bottleneck.
-Try to understand the author's mindset. Try to run lots of tests, experiments 
-verifications when possible. 
+## The daily loop (read this before writing code)
 
+One cycle: the author spends ~1 hour on results and direction; the agent then
+works up to 23 hours and comes back with artifacts. **The author does not read
+the diff.** Artifacts, not code, are the deliverable — so they must be
+trustworthy *without* a code review. Communication is the bottleneck; produce
+lots of visual artifacts.
+
+A run:
+
+1. **Pre-register.** Before running anything, write down each experiment, what
+   you expect, and what each outcome would mean. An experiment whose outcomes
+   would not change what we do next is not worth running. Prefer a few decisive
+   experiments over many shallow ones — 23 hours defaults to volume, and volume
+   is what the author's hour cannot absorb.
+2. **Work.** Tests, probes and verification everywhere they are cheap.
+3. **Self-verify.** No number is reportable without (a) its oracle gap and (b) an
+   independent re-derivation that raises on disagreement. The oracles are what
+   replaces the author's code review — an agent cannot fake an oracle gap, which
+   is exactly why the synthetic curriculum exists.
+4. **Report** to `results/reports/<date>-<slug>.md`, in this order:
+   - **Surprises** — predicted vs. actual, largest divergence first. This is what
+     the author's hour is for.
+   - **Numbers** — bpc vs. oracle per rung, with deltas and what moved.
+   - **Artifacts** — links, each figure captioned with the claim it supports.
+   - **What I did not do, and where I might be fooling you** — dead ends,
+     negative results, and the weakest link above. Required, not optional; write
+     it even when it is dull. Silence here is this loop's failure mode.
+   - **Proposed next** — ranked, with the reason each is next.
+5. **Log.** Append one entry to `JOURNAL.md` linking the report, and commit.
+
+## Where state lives (this file holds only invariants)
+
+CLAUDE.md is for what does not change: goals, theses, settled decisions, how we
+work. Anything that moves lives elsewhere, so it can be rewritten without
+touching the agreement — and so nothing here goes quietly stale.
+
+- **`JOURNAL.md`** — the running summary: standing numbers (best bpc vs. oracle
+  per rung) plus one terse entry per run, each linking its full report. Read it
+  before starting; append before finishing. Keep entries to ~5 lines and fold
+  old ones into single lines as it grows — like a professor who carries the
+  student's results and opens the write-up only when the details matter.
+- **`results/reports/`** — the full report for each run, with the figures worth
+  keeping. Tracked in git.
+- **`results/`** (everything else) — scratch: regenerable eval output, probes,
+  throwaway plots. Gitignored, and never linked from `JOURNAL.md`.
+- **`docs/`** — durable design notes and handoffs, e.g.
+  `docs/handoff_pcfg_track.md` (the parked PCFG track).
+
+The journal is auto-loaded for Claude Code by the import below; other agents
+should read it explicitly.
+
+@JOURNAL.md
 
 ## Conventions
 

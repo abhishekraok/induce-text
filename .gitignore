@@ -11,5 +11,7 @@ dist/
 data/
 *.zip
 
-# Benchmark outputs (regenerable via `induce-text eval`)
-results/
+# Benchmark outputs. Scratch is regenerable via `induce-text eval` and stays
+# untracked; polished per-run reports and their figures are committed.
+results/*
+!results/reports/
