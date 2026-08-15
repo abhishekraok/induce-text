@@ -52,6 +52,9 @@ the tension honestly — and lean elegant.
   it under MDL*, buying expressivity only where the data pays for it in bits.
   Compression's dense signal may make expressivity learnable where sparse PBE
   reward never could.
+- **Building world model.** A world model is useful for generalization and
+  compression. Hopefully a decent world model emerges out of the compression
+  task. Lean into concepts like JEPA.
 
 ## Prior work (the author's, converging here)
 
