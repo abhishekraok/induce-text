@@ -148,17 +148,36 @@ A run:
    them for the author's review — see § Changing this file. "Nothing durable"
    is a fine answer, and the expected one most days.
 
+## Explaining an algorithm
+
+When a new algorithm enters the project — to adopt, to port, or just to decide
+about — build an interactive artifact, not a summary. The author learns
+mechanisms by driving them, and this beats reading the paper. What makes one
+work:
+
+- **Steppable execution** over a real input, internal state redrawn each step:
+  the algorithm runs, it is not described.
+- **State visible at once** — what it is building, its working data, and a log
+  of what it just did.
+- **Inputs that attack it.** Each preset probes a different claim, and at least
+  one must be a case the algorithm *fails* — the limit teaches more than the
+  success. Let the author type his own input too.
+- **Honest instrumentation.** If a readout is a proxy, say so on the page.
+
+The bar to match — Sequitur, one symbol at a time:
+`https://claude.ai/code/artifact/219e871a-a08e-49f6-b621-3780bbb67790`
+
 ## Where state lives (this file holds only invariants)
 
 CLAUDE.md is for what does not change: goals, theses, settled decisions, how we
 work. Anything that moves lives elsewhere, so it can be rewritten without
 touching the agreement — and so nothing here goes quietly stale.
 
-- **`JOURNAL.md`** — the running summary: standing numbers (best bpc vs. oracle
-  per rung) plus one terse entry per run, each linking its full report. Read it
-  before starting; append before finishing. Keep entries to ~5 lines and fold
-  old ones into single lines as it grows — like a professor who carries the
-  student's results and opens the write-up only when the details matter.
+- **`JOURNAL.md`** — the running summary: one terse entry per run linking its
+  report, plus any open doubts about the harness itself. Descriptions and
+  pointers, *not* results — numbers live in the reports, and `induce-text eval`
+  regenerates the current bar. Read it before starting; append before finishing.
+  Keep entries to ~3 lines and fold old ones into one as it grows.
 - **`results/reports/`** — the full report for each run, with the figures worth
   keeping. Tracked in git.
 - **`results/`** (everything else) — scratch: regenerable eval output, probes,
