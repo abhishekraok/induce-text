@@ -124,48 +124,33 @@ lots of visual artifacts.
 
 A run:
 
-1. **Pre-register.** Before running anything, write down each experiment, what
-   you expect, and what each outcome would mean. An experiment whose outcomes
-   would not change what we do next is not worth running. Prefer a few decisive
-   experiments over many shallow ones — 23 hours defaults to volume, and volume
-   is what the author's hour cannot absorb.
+1. **Pre-register** — each experiment, what you expect, and what each outcome
+   would mean, before running anything. Drop any experiment whose outcomes
+   would not change what we do next. Few decisive experiments, not many shallow
+   ones: 23 hours defaults to volume, and volume is what the author's hour
+   cannot absorb.
 2. **Work.** Tests, probes and verification everywhere they are cheap.
-3. **Self-verify.** No number is reportable without (a) its oracle gap and (b) an
-   independent re-derivation that raises on disagreement. The oracles are what
-   replaces the author's code review — an agent cannot fake an oracle gap, which
-   is exactly why the synthetic curriculum exists.
-4. **Report** to `results/reports/<date>-<slug>.md`, in this order:
-   - **Surprises** — predicted vs. actual, largest divergence first. This is what
-     the author's hour is for.
-   - **Numbers** — bpc vs. oracle per rung, with deltas and what moved.
-   - **Artifacts** — links, each figure captioned with the claim it supports.
-   - **What I did not do, and where I might be fooling you** — dead ends,
-     negative results, and the weakest link above. Required, not optional; write
-     it even when it is dull. Silence here is this loop's failure mode.
-   - **Proposed next** — ranked, with the reason each is next.
+3. **Self-verify.** No number is reportable without its oracle gap and an
+   independent re-derivation that raises on disagreement. This is what replaces
+   the author's code review — an agent cannot fake an oracle gap.
+4. **Report** to `results/reports/<date>-<slug>.md`: surprises first, then
+   numbers, artifacts, **what you did not do and where you might be fooling the
+   reader**, then proposed next.
 5. **Log.** Append one entry to `JOURNAL.md` linking the report, and commit.
-6. **Propose.** Check for durable learnings that belong in this file and draft
-   them for the author's review — see § Changing this file. "Nothing durable"
-   is a fine answer, and the expected one most days.
+6. **Propose** durable learnings for this file — see § Changing this file.
+   "Nothing durable" is a fine answer, and the expected one most days.
+
+Templates and the full protocol: `docs/run_protocol.md`.
 
 ## Explaining an algorithm
 
 When a new algorithm enters the project — to adopt, to port, or just to decide
-about — build an interactive artifact, not a summary. The author learns
-mechanisms by driving them, and this beats reading the paper. What makes one
-work:
+about — build an interactive artifact, not a summary: steppable execution, state
+visible at once, inputs chosen so at least one is a case the algorithm *fails*,
+and proxies labelled as proxies. The author learns mechanisms by driving them,
+and it beats reading the paper.
 
-- **Steppable execution** over a real input, internal state redrawn each step:
-  the algorithm runs, it is not described.
-- **State visible at once** — what it is building, its working data, and a log
-  of what it just did.
-- **Inputs that attack it.** Each preset probes a different claim, and at least
-  one must be a case the algorithm *fails* — the limit teaches more than the
-  success. Let the author type his own input too.
-- **Honest instrumentation.** If a readout is a proxy, say so on the page.
-
-The bar to match — Sequitur, one symbol at a time:
-`https://claude.ai/code/artifact/219e871a-a08e-49f6-b621-3780bbb67790`
+How, and the bar to match: `docs/explainers.md`.
 
 ## Where state lives (this file holds only invariants)
 
