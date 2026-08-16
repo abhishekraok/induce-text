@@ -19,6 +19,11 @@ matter more than results because the loop's trust rests on them.
 
 ## Entries
 
+- **2026-08-15** — activated-function first atom: a verified CTW-inspired
+  suffix hierarchy establishes the nested-feature control, exposes sharp
+  global-to-local gating and candidate-growth waste, and specifies the next
+  prospective residual specialist →
+  `results/reports/2026-08-15-activated-functions.md`.
 - **2026-08-15** — regime change: artifact-driven daily loop; CLAUDE.md cut to
   invariants; agents may not edit it without consent; interactive explainers
   required when a new algorithm enters. PCFG track parked →
