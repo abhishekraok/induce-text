@@ -8,9 +8,9 @@ the code itself does not say. It is kept current by proposal, not by fiat — se
 ## What this is
 
 A long-term research program: **language modelling via program synthesis**,
-scored as compression on the enwik / Hutter Prize benchmark. This is the
-author's life task, not a product to ship fast. The ideas *are* the output; the
-code is the lab notebook in which the ideas are thought.
+scored as compression on the enwik / Hutter Prize benchmark. Not a product to
+ship fast: the ideas *are* the output, and the code is the lab notebook in
+which the ideas are thought.
 
 ## North star (this judges every decision below)
 
@@ -35,8 +35,8 @@ the tension honestly — and lean elegant.
   The author delegates implementation, but not understanding: what he wants back
   from a run is insight, so reports must *teach* the mechanism, not just post the
   number. Argue the other side of a design choice when there is one.
-- The author's Obsidian Zettelkasten notes — i.e. his mindset — are at
-  `~/repos/obsidian`.
+- The author's Obsidian Zettelkasten notes are at `~/repos/obsidian` — local
+  and private, not part of this repo.
 
 ## Core theses
 
@@ -58,19 +58,21 @@ the tension honestly — and lean elegant.
 
 ## Prior work (the author's, converging here)
 
-- **StreamPredictor** (`~/repos/StreamPredictor`) — hierarchical
+- **[StreamPredictor](https://github.com/abhishekraok/StreamPredictor)** — hierarchical
   patterns-of-patterns text predictor. Its plateau left scars now treated as
   design constraints: never key knowledge by exact match (reachability; query
   by partial/prefix match), watch effective context length (silent bigram
   collapse), measure *calibration* not just accuracy, votes must sum not
   overwrite, and charge description length for the model (two-part code) so
   more data always helps.
-- **wandering-light** (`~/repos/wandering-light`) — PBE via self-play
+- **[wandering-light](https://github.com/abhishekraok/wandering-light)** — PBE via self-play
   (induction + proposal tasks). Learnable but inexpressive; its binary
   exact-match reward is the sparsity this project's bit-signal replaces.
-- **code-map** (`~/repos/code-map`) — Racket image-based function library
+- **[code-map](https://github.com/abhishekraok/code-map)** — Racket image-based function library
   (function-per-file, REPL, persistence). Candidate substrate for the eventual
   library of synthesized predictor functions.
+
+All three are checked out locally under `~/repos/`.
 
 ## Settled design decisions
 
@@ -117,9 +119,9 @@ the tension honestly — and lean elegant.
 ## The daily loop (read this before writing code)
 
 One cycle: the author spends ~1 hour on results and direction; the agent works
-up to 23 hours and returns artifacts. **The author does not read the diff** — so
-artifacts must be trustworthy without a code review. Communication is the
-bottleneck; produce lots of visual artifacts.
+up to 23 hours and returns artifacts. The author reviews results, not diffs, so
+artifacts must be trustworthy without a code review; step 3 below is what takes
+its place. Communication is the bottleneck; produce lots of visual artifacts.
 
 1. **Pre-register** each experiment, what you expect, and what each outcome
    would mean, before running. Drop any whose outcomes change nothing. Few
