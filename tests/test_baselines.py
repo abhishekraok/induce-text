@@ -11,18 +11,18 @@ def test_adaptive_iid_learns_constant_data():
     assert bpc(Uniform(), data) == pytest.approx(8.0)
 
 
-def test_adaptive_iid_approaches_iid_oracle():
-    data, oracle_bits = skewed_iid(20_000, seed=1)
-    oracle_bpc = oracle_bits / len(data)
+def test_adaptive_iid_approaches_iid_cost():
+    data, process_bits = skewed_iid(20_000, seed=1)
+    process_bpc = process_bits / len(data)
     model_bpc = bpc(AdaptiveIID(), data)
-    # Online learning pays a redundancy above the oracle, but it shrinks:
+    # Online learning pays a redundancy above the process cost, but it shrinks:
     # at 20k bytes the gap should be small.
-    assert model_bpc == pytest.approx(oracle_bpc, abs=0.25)
+    assert model_bpc == pytest.approx(process_bpc, abs=0.25)
 
 
 def test_context_beats_iid_on_markov():
-    data, oracle_bits = markov(20_000, seed=1)
-    oracle_bpc = oracle_bits / len(data)
+    data, process_bits = markov(20_000, seed=1)
+    process_bpc = process_bits / len(data)
     iid_bpc = bpc(AdaptiveIID(), data)
     ctx1_bpc = bpc(ContextK(1), data)
     # The chain's stationary distribution is uniform over 4 symbols: no
@@ -30,7 +30,7 @@ def test_context_beats_iid_on_markov():
     # the conditional entropy (~0.61 bpc).
     assert iid_bpc > 1.7
     assert ctx1_bpc < 1.2
-    assert ctx1_bpc > oracle_bpc  # can't beat the source, only approach it
+    assert ctx1_bpc > process_bpc  # can't beat the source, only approach it
 
 
 def test_context_nails_periodic():

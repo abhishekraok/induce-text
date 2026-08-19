@@ -1,24 +1,48 @@
-"""Synthetic data sources with a known-MDL oracle (CLAUDE.md decision 7).
+"""Synthetic data sources with a known generative cost (CLAUDE.md decision 7).
 
-Each source returns ``(data, oracle_bits)`` where ``oracle_bits`` is the exact
+Each source returns ``(data, process_bits)`` where ``process_bits`` is the exact
 number of bits the generating process spent on random choices — the sum of
 ``-log2 P(choice)`` over every choice made.  Deterministic structure is free.
 
-Two-part-code honesty: ``oracle_bits`` is ``bits(data | process)`` only.  The
+Two-part-code honesty: ``process_bits`` is ``bits(data | process)`` only.  The
 description of the process itself (the "model" half of the two-part code) is
-not charged, because here the process is *known* — that is the whole point of
-a synthetic oracle: verification becomes absolute, not relative to gzip.  An
-online model that has to *learn* the process pays a learning overhead above
-the oracle; watching that overhead shrink is the game.
+not charged, because here the process is *known*.  An online model that has to
+*learn* the process pays a learning overhead above it; watching that overhead
+shrink is the game.
+
+**The invariant, and it is not automatic.**  ``process_bits`` is
+``-log2 P(choices)``.  The ideal code length is ``-log2 P(data)``, and
+``P(data) = sum P(choices)`` over *every* choice sequence yielding those bytes.
+So ``process_bits`` equals the ideal code length **only when the generator is
+injective** — when the output determines the choices that made it.  For a
+many-to-one generator it is an *upper* bound, and a good compressor can and
+should beat it.  Treating it as a floor there is a category error.
 
 The curriculum, each rung targeting a known failure mode:
 
-- ``periodic``        — pure structure, zero entropy (oracle = 0).
-- ``skewed_iid``      — calibration: dyadic distribution, H = 1.875 bpc.
-- ``markov``          — context: order-1 chain, structure is one symbol back.
-- ``long_range_copy`` — reachability: LZ-style copies; NOT context-free.
-- ``pcfg``            — abstraction: the author's grammar generator; the
-  choice transcript length *is* the oracle (all choices are 50:50).
+===================== ============ =========================================
+rung                  injective?   ``process_bits`` is
+===================== ============ =========================================
+``periodic``          yes (det.)   exact; zero entropy, so 0
+``skewed_iid``        yes          exact; H = 1.875 bpc
+``markov``            yes          exact; order-1, structure one symbol back
+``long_range_copy``   **no**       upper bound only — see below
+``pcfg``              yes          exact; verified unambiguous
+===================== ============ =========================================
+
+``long_range_copy`` is many-to-one: the same bytes are reachable from many
+different offsets, so the offset choice carries bits the output does not
+determine.  Measured at n=20000: an identical 8-byte segment has on average
+3.88 distinct earlier source offsets (max 25), about 1.96 bits per copy op
+that this function charges and the data does not carry — roughly 0.18 bpc,
+which accounts for essentially all of the observed 0.21 bpc by which lzma
+beats it.  **On this rung compare against lzma, not against process_bits.**
+Recovering a true lower bound here means marginalising over parses with a
+forward DP, which is not implemented.
+
+``pcfg`` was checked by enumerating every complete episode up to 16 choice
+bits (510 of them): no two distinct transcripts produce the same output, so
+its transcript length is exact.
 
 Sources generate whole steps/episodes until at least ``n`` bytes exist and
 return everything generated (possibly slightly more than ``n``): truncating
@@ -37,14 +61,14 @@ from induce_text.pcfg_gen import RecordingChoice, Rule, sample
 
 
 def periodic(n: int, seed: int = 0, pattern: bytes = b"\x00\x01\x02\x03") -> tuple[bytes, float]:
-    """Repeat ``pattern`` to at least ``n`` bytes.  No choices: oracle = 0."""
+    """Repeat ``pattern`` to at least ``n`` bytes.  No choices: process_bits = 0."""
     reps = -(-n // len(pattern))
     return pattern * reps, 0.0
 
 
 # --- rung 2: skewed i.i.d. --------------------------------------------------
 
-# Dyadic by design so the oracle is hand-checkable: byte b costs exactly
+# Dyadic by design so the cost is hand-checkable: byte b costs exactly
 # SKEW_BITS[b] bits.  H = 1/2*1 + 1/4*2 + 1/8*3 + 2*(1/16*4) = 1.875 bpc.
 SKEW = {0: 1 / 2, 1: 1 / 4, 2: 1 / 8, 3: 1 / 16, 4: 1 / 16}
 
@@ -128,7 +152,7 @@ def long_range_copy(n: int, seed: int = 0) -> tuple[bytes, float]:
 # --- rung 5: nested grammar (the author's PCFG generator) -------------------
 
 # The grammar used by tests/test_pcfg_gen.py.  All choices are 50:50, so an
-# episode's oracle bits = its transcript length, exactly.
+# episode's process_bits = its transcript length, exactly.
 
 
 def pcfg_test_grammar() -> tuple[Rule, dict[str, int | Rule]]:
@@ -146,7 +170,7 @@ def pcfg_main_grammar() -> tuple[Rule, dict[str, int | Rule]]:
 
 
 def pcfg(n: int, seed: int = 0) -> tuple[bytes, float]:
-    """Concatenated episodes from the test grammar; oracle = total choice bits."""
+    """Concatenated episodes from the test grammar; process_bits = total choice bits."""
     rule, env = pcfg_test_grammar()
     rng = random.Random(seed)
     data: list[int] = []

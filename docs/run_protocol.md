@@ -23,13 +23,18 @@ record, a result is just a number.
 
 No number is reportable without both:
 
-1. its oracle gap, where the source has a known-MDL oracle; and
+1. its gap to the rung's reference, and
 2. an independent re-derivation that raises on disagreement.
 
-The oracles replace the author's code review — an agent cannot fake an oracle
-gap, and that is what the synthetic curriculum is for. Where a rung's oracle is
-itself in doubt (`JOURNAL.md` § Open doubts), say so rather than quoting the gap
-as though it were sound.
+The synthetic curriculum replaces the author's code review — an agent cannot
+fake a gap against a known generative cost.
+
+**Which reference.** `process_bits` is a floor only on rungs whose generator is
+injective; the per-rung table in `sources.py` says which. On a many-to-one rung
+(`long_range_copy`) it is an upper bound and a good compressor beats it —
+compare against lzma there and say which reference you used. Quoting a
+`process_bits` gap as though it were a floor on those rungs is a category
+error, not a small imprecision.
 
 ## Report
 
@@ -39,7 +44,7 @@ One file per run: `results/reports/<date>-<slug>.md`. Sections in this order.
 author's hour is for. If nothing surprised you, say so in one line — then check
 that it is not because the predictions were hedged.
 
-**Numbers.** bpc vs. oracle per rung, with deltas and what moved. Mark which are
+**Numbers.** bpc vs. the rung's reference (named per rung), with deltas and what moved. Mark which are
 new and which are carried forward.
 
 **Artifacts.** Links. Caption each figure with the claim it supports, not with

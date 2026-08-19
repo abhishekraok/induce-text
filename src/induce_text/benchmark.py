@@ -1,7 +1,7 @@
-"""The benchmark matrix: models x sources -> bpc, vs oracle and reference.
+"""The benchmark matrix: models x sources -> bpc, vs generative cost and reference.
 
 Runs every baseline over every requested source, reports bpc against the
-source's oracle MDL (when known) and against off-the-shelf compressors
+source's known generative cost (when available) and against off-the-shelf compressors
 (gzip/bz2/xz) as external reference points.  Persists a JSON record and,
 optionally, learning-curve plots (running bpc vs position — where slow
 warm-up and silent collapse become visible).
@@ -34,7 +34,7 @@ from induce_text.sources import SOURCES
 class Row:
     source: str
     n: int
-    oracle_bpc: float | None
+    process_bpc: float | None
     model_bpc: dict[str, float] = field(default_factory=dict)
     ref_bpc: dict[str, float] = field(default_factory=dict)
     # per-model per-byte bits, kept for plotting; not serialized.
@@ -42,17 +42,17 @@ class Row:
 
 
 def resolve_source(spec: str, n: int, seed: int) -> tuple[str, bytes, float | None]:
-    """Resolve a source spec to (name, data, oracle_bits).
+    """Resolve a source spec to (name, data, process_bits).
 
     ``spec`` is a synthetic source name from SOURCES or a corpus name
     (e.g. ``enwik8``), optionally with a byte count: ``enwik8:1000000``.
-    Corpora have no oracle.
+    Corpora have no known generative cost.
     """
     name, _, size = spec.partition(":")
     length = int(size) if size else n
     if name in SOURCES:
-        data, oracle_bits = SOURCES[name](length, seed)
-        return name, data, oracle_bits
+        data, process_bits = SOURCES[name](length, seed)
+        return name, data, process_bits
     data = data_mod.load(name, n_bytes=length)
     return name, data, None
 
@@ -77,11 +77,11 @@ def run(
     models = models if models is not None else default_models()
     rows = []
     for spec in source_specs:
-        name, data, oracle_bits = resolve_source(spec, n, seed)
+        name, data, process_bits = resolve_source(spec, n, seed)
         row = Row(
             source=name,
             n=len(data),
-            oracle_bpc=None if oracle_bits is None else oracle_bits / len(data),
+            process_bpc=None if process_bits is None else process_bits / len(data),
         )
         row.ref_bpc = reference_bpc(data)
         for model_name, model in models.items():
@@ -102,7 +102,7 @@ def run(
 def format_table(rows: list[Row]) -> str:
     model_names = list(rows[0].model_bpc)
     ref_names = list(rows[0].ref_bpc)
-    header = ["source", "n", "oracle"] + model_names + ref_names
+    header = ["source", "n", "process"] + model_names + ref_names
     lines = []
     widths = [16, 9, 7] + [8] * (len(model_names) + len(ref_names))
     lines.append("  ".join(h.rjust(w) for h, w in zip(header, widths)))
@@ -110,7 +110,7 @@ def format_table(rows: list[Row]) -> str:
         cells = [
             row.source,
             f"{row.n:,}",
-            "-" if row.oracle_bpc is None else f"{row.oracle_bpc:.4f}",
+            "-" if row.process_bpc is None else f"{row.process_bpc:.4f}",
         ]
         cells += [f"{row.model_bpc[m]:.4f}" for m in model_names]
         cells += [f"{row.ref_bpc[r]:.4f}" for r in ref_names]
@@ -128,7 +128,7 @@ def save_json(rows: list[Row], out_dir: Path, meta: dict) -> Path:
             {
                 "source": r.source,
                 "n": r.n,
-                "oracle_bpc": r.oracle_bpc,
+                "process_bpc": r.process_bpc,
                 "model_bpc": r.model_bpc,
                 "ref_bpc": r.ref_bpc,
             }
@@ -153,9 +153,9 @@ def save_plots(rows: list[Row], out_dir: Path) -> list[Path]:
         for model_name, bits in row.curves.items():
             positions = np.arange(1, len(bits) + 1)
             ax.plot(positions, np.cumsum(bits) / positions, label=model_name)
-        if row.oracle_bpc is not None:
+        if row.process_bpc is not None:
             ax.axhline(
-                row.oracle_bpc, linestyle="--", color="black", label="oracle"
+                row.process_bpc, linestyle="--", color="black", label="process bits"
             )
         ax.set(
             title=f"{row.source} (n={row.n:,})",
